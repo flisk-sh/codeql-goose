@@ -1,0 +1,43 @@
+# Creates the GitHub release for a pushed version tag.
+#
+# This workflow does NOT publish to the GitHub Marketplace. GitHub only allows that from the release page, after
+# accepting the Marketplace terms. See "Releasing" in the README.
+name: 🚀 Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: 🚀 Create release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Check the tag matches TOOL_VERSION
+        run: |
+          version=$(sed -n 's/^TOOL_VERSION = "\(.*\)"$/\1/p' goose_analyze.py)
+          if [ -z "$version" ]; then
+            echo "::error::TOOL_VERSION not found in goose_analyze.py"
+            exit 1
+          fi
+          if [ "$TAG" != "v$version" ]; then
+            echo "::error::Tag $TAG does not match TOOL_VERSION $version (expected v$version)"
+            exit 1
+          fi
+      - name: Run unit tests
+        run: python3 -m unittest tests.test_rules -v
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$TAG" --generate-notes --verify-tag --title "$TAG"

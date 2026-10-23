@@ -67,6 +67,12 @@ Python 3.9 or newer is enough. There are no dependencies.
 
 Early. The rule set is small, each rule has tests, and the rules come from the standard library docs at [aardappel/goose](https://github.com/aardappel/goose). The action has not yet run from a caller on GitHub.
 
+## Releasing
+
+1. Bump `TOOL_VERSION` in `goose_analyze.py` and merge it to `main`.
+2. Tag the merge commit `vX.Y.Z` (the same version) and push the tag. The release workflow checks that the tag matches `TOOL_VERSION`, runs the tests and creates the GitHub release with generated notes.
+3. Open that release, choose **Edit**, tick **Publish this Action to the GitHub Marketplace**, pick the categories and save. GitHub only allows this from the release page, after accepting the Marketplace terms, so no workflow does it.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
