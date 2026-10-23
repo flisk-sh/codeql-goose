@@ -1,10 +1,10 @@
 # codeql-goose
 
-> **Unofficial community project.** Not made, endorsed or supported by GitHub, the CodeQL team or the authors of Goose. It does not use CodeQL: it reads Goose source with a small lexer and reports through SARIF.
+> **Community project.** Not made, endorsed or supported by GitHub, the CodeQL team or the authors of Goose. It does not use CodeQL: it reads Goose source with a small lexer and reports through SARIF.
 
 Goose here is the programming language at [aardappel/goose](https://github.com/aardappel/goose), not the Goose AI agent or the Goose database migration tool.
 
-**Published on the GitHub Marketplace:** [Goose Analyzer for Code Scanning (unofficial)](https://github.com/marketplace/actions/goose-analyzer-for-code-scanning-unofficial).
+**Published on the GitHub Marketplace:** [Goose Analyzer for Code Scanning](https://github.com/marketplace/actions/goose-analyzer-for-code-scanning).
 
 Static checks for `*.goose` files that write [SARIF 2.1.0](https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html), so results appear under Code scanning next to CodeQL.
 

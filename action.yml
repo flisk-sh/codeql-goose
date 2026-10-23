@@ -1,5 +1,5 @@
-name: Goose Analyzer for Code Scanning (unofficial)
-description: Unofficial Goose checks for *.goose files that upload SARIF to Code scanning. Not made by GitHub.
+name: Goose Analyzer for Code Scanning
+description: Goose checks for *.goose files that upload SARIF to Code scanning. Not made by GitHub.
 
 branding:
   icon: shield
