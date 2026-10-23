@@ -1,5 +1,9 @@
-name: CodeQL Goose (unofficial)
-description: Unofficial community Goose checks that upload SARIF to GitHub Code scanning. Not made or endorsed by GitHub, the CodeQL team or the Goose authors.
+name: Goose Analyzer for Code Scanning (unofficial)
+description: Unofficial Goose checks for *.goose files that upload SARIF to Code scanning. Not made by GitHub.
+
+branding:
+  icon: shield
+  color: blue
 
 inputs:
   patterns:
