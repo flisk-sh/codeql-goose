@@ -20,7 +20,7 @@ There is no Goose parser. A lexer skips comments and reads strings, so text insi
 
 ## Use it in a repository
 
-Pin the reusable workflow to a full commit SHA:
+Add a job that checks out your repository and runs the action, pinned to a full commit SHA:
 
 ```yaml
 name: 🔬 Goose
@@ -35,17 +35,22 @@ permissions:
 
 jobs:
   goose:
-    uses: flisk-sh/codeql-goose/.github/workflows/codeql-goose.yml@<full commit SHA>
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       security-events: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: flisk-sh/codeql-goose@<full commit SHA>
 ```
 
 Inputs:
 
 - `patterns`: space-separated globs. Default `**/*.goose`.
 - `category`: SARIF category in Code scanning. Default `/language:goose`.
-- `fail-on-findings`: fail the job on any result. Default `false`, report only.
+- `fail-on-findings`: set to `"true"` to fail the step on any result. Default `"false"`, report only.
 
 ## Run it locally
 
@@ -58,7 +63,7 @@ Python 3.9 or newer is enough. There are no dependencies.
 
 ## Status
 
-Early. The rule set is small, each rule has tests, and the rules come from the standard library docs at [aardappel/goose](https://github.com/aardappel/goose). The reusable workflow has not yet run from a caller.
+Early. The rule set is small, each rule has tests, and the rules come from the standard library docs at [aardappel/goose](https://github.com/aardappel/goose). The action has not yet run from a caller on GitHub.
 
 ## License
 
