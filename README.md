@@ -4,6 +4,8 @@
 
 Goose here is the programming language at [aardappel/goose](https://github.com/aardappel/goose), not the Goose AI agent or the Goose database migration tool.
 
+**Published on the GitHub Marketplace:** [Goose Analyzer for Code Scanning (unofficial)](https://github.com/marketplace/actions/goose-analyzer-for-code-scanning-unofficial).
+
 Static checks for `*.goose` files that write [SARIF 2.1.0](https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html), so results appear under Code scanning next to CodeQL.
 
 CodeQL does not analyze Goose. This project fills that gap in a limited way.
