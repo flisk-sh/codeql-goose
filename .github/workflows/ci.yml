@@ -17,7 +17,8 @@ concurrency:
 jobs:
   test:
     name: 🧪 Analyzer unit tests (Python ${{ matrix.python }})
-    runs-on: ubuntu-latest
+    # Python 3.9 has no build for ubuntu-latest (now 26.04); pin until 3.9 is dropped.
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     strategy:
       fail-fast: false
