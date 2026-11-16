@@ -11,6 +11,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     name: 🚀 Create release
@@ -41,8 +45,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view "$TAG" >/dev/null 2>&1; then
+          if out=$(gh release view "$TAG" 2>&1); then
             echo "Release $TAG already exists; skipping creation."
+          elif echo "$out" | grep -qi "release not found"; then
+            if ! gh release create "$TAG" --generate-notes --verify-tag --title "$TAG"; then
+              # A concurrent run may have created it between the lookup and the create.
+              gh release view "$TAG" >/dev/null 2>&1 || exit 1
+              echo "Release $TAG was created concurrently; nothing to do."
+            fi
           else
-            gh release create "$TAG" --generate-notes --verify-tag --title "$TAG"
+            echo "::error::Could not look up release $TAG: $out"
+            exit 1
           fi
