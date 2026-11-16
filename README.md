@@ -54,14 +54,18 @@ Inputs:
 - `category`: SARIF category in Code scanning. Default `/language:goose`.
 - `fail-on-findings`: set to `"true"` to fail the step on any result. Default `"false"`, report only.
 
+If no files match `patterns`, the analyzer logs a warning and writes an empty SARIF report. The scan still succeeds.
+
 ## Run it locally
 
 ```bash
 python3 goose_analyze.py --root path/to/project --output codeql-goose.sarif
-python3 -m unittest tests.test_rules -v
+python3 -m unittest discover -s tests -t . -v
 ```
 
 Python 3.9 or newer is enough. There are no dependencies.
+
+`--root` must point to an existing directory. If it names a missing path or a file, the CLI exits with status 2 before writing a report.
 
 ## Status
 
