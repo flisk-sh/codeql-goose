@@ -60,7 +60,7 @@ If no files match `patterns`, the analyzer logs a warning and writes an empty SA
 
 ```bash
 python3 goose_analyze.py --root path/to/project --output codeql-goose.sarif
-python3 -m unittest tests.test_rules -v
+python3 -m unittest discover -s tests -t . -v
 ```
 
 Python 3.9 or newer is enough. There are no dependencies.
