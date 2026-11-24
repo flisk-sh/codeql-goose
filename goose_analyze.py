@@ -12,6 +12,7 @@ import json
 import os
 import re
 import sys
+from urllib.parse import quote
 
 # --- language config -------------------------------------------------------
 DEFAULT_PATTERNS = ["**/*.goose"]
@@ -261,6 +262,7 @@ def build_sarif(root, files):
 
     results, notifications = [], []
     for relpath in files:
+        uri = quote(relpath, safe="/", errors="surrogateescape")
         with open(os.path.join(root, relpath), encoding="utf-8", errors="replace") as handle:
             source = handle.read()
         findings, problems = analyze_source(source, relpath)
@@ -270,7 +272,7 @@ def build_sarif(root, files):
                     "level": "note",
                     "message": {"text": f"{relpath}: {message}"},
                     "locations": [
-                        {"physicalLocation": {"artifactLocation": {"uri": relpath}, "region": {"startLine": line}}}
+                        {"physicalLocation": {"artifactLocation": {"uri": uri}, "region": {"startLine": line}}}
                     ],
                 }
             )
@@ -286,7 +288,7 @@ def build_sarif(root, files):
                     "locations": [
                         {
                             "physicalLocation": {
-                                "artifactLocation": {"uri": relpath},
+                                "artifactLocation": {"uri": uri},
                                 "region": {"startLine": item["line"], "startColumn": item["column"]},
                             }
                         }
