@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import shutil
@@ -95,6 +96,25 @@ class SarifTests(unittest.TestCase):
             with self.subTest(message=item["message"]["text"]):
                 self.assertEqual(item["locations"][0]["physicalLocation"]["artifactLocation"]["uri"], expected)
         self.assertIn(f"src/{name}", note["message"]["text"])
+
+    def test_identical_findings_on_different_lines_get_distinct_fingerprints(self):
+        with tempfile.TemporaryDirectory() as root:
+            with open(os.path.join(root, "two.goose"), "w", encoding="utf-8") as handle:
+                handle.write('write_file("a.txt", d);\nwrite_file("a.txt", d);\n')
+            run = an.build_sarif(root, an.discover(root, an.DEFAULT_PATTERNS))["runs"][0]
+        self.assertEqual(len(run["results"]), 2)
+        hashes = {r["partialFingerprints"]["findingHash/v1"] for r in run["results"]}
+        self.assertEqual(len(hashes), 2)
+
+    def test_a_first_finding_keeps_its_original_fingerprint(self):
+        with tempfile.TemporaryDirectory() as root:
+            with open(os.path.join(root, "one.goose"), "w", encoding="utf-8") as handle:
+                handle.write('write_file("a.txt", d);\n')
+            run = an.build_sarif(root, an.discover(root, an.DEFAULT_PATTERNS))["runs"][0]
+        expected = hashlib.sha256(
+            b"unchecked-result|one.goose|write_file() returns a success flag that is discarded."
+        ).hexdigest()
+        self.assertEqual(run["results"][0]["partialFingerprints"]["findingHash/v1"], expected)
 
     def test_end_to_end_writes_valid_sarif_shape(self):
         out = tempfile.mkdtemp()

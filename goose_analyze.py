@@ -242,8 +242,14 @@ def discover(root, patterns):
     return sorted(seen)
 
 
-def fingerprint(rule_id, relpath, message):
-    return hashlib.sha256(f"{rule_id}|{relpath}|{message}".encode("utf-8")).hexdigest()
+def fingerprint(rule_id, relpath, message, occurrence=0):
+    # Code scanning deduplicates and tracks alerts by their partial fingerprint, so two findings
+    # that differ only in their line must not share one. The first occurrence of a (rule, file,
+    # message) finding keeps the original hash, so an alert reported before this change still
+    # matches; repeats get an occurrence suffix. Position is not hashed, so a finding keeps its
+    # identity when code above it moves it to a different line.
+    base = f"{rule_id}|{relpath}|{message}"
+    return hashlib.sha256(f"{base}|{occurrence}".encode("utf-8") if occurrence else base.encode("utf-8")).hexdigest()
 
 
 def build_sarif(root, files):
@@ -266,6 +272,7 @@ def build_sarif(root, files):
         with open(os.path.join(root, relpath), encoding="utf-8", errors="replace") as handle:
             source = handle.read()
         findings, problems = analyze_source(source, relpath)
+        occurrences = {}
         for line, message in problems:
             notifications.append(
                 {
@@ -279,6 +286,9 @@ def build_sarif(root, files):
         for item in findings:
             if item["rule"] not in rules_meta:
                 continue
+            key = (item["rule"], relpath, item["message"])
+            occurrence = occurrences.get(key, 0)
+            occurrences[key] = occurrence + 1
             results.append(
                 {
                     "ruleId": item["rule"],
@@ -294,7 +304,7 @@ def build_sarif(root, files):
                         }
                     ],
                     "partialFingerprints": {
-                        "findingHash/v1": fingerprint(item["rule"], relpath, item["message"]),
+                        "findingHash/v1": fingerprint(item["rule"], relpath, item["message"], occurrence),
                     },
                 }
             )
