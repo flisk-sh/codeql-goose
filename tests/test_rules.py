@@ -80,6 +80,22 @@ class FixtureTests(unittest.TestCase):
 
 
 class SarifTests(unittest.TestCase):
+    def test_finding_and_notification_use_encoded_relative_uris(self):
+        with tempfile.TemporaryDirectory() as root:
+            name = "caf\u00e9 #50%.goose"
+            os.mkdir(os.path.join(root, "src"))
+            with open(os.path.join(root, "src", name), "w", encoding="utf-8") as handle:
+                handle.write('write_file("notes.txt", data);\n/* unfinished comment\n')
+            run = an.build_sarif(root, an.discover(root, an.DEFAULT_PATTERNS))["runs"][0]
+
+        finding = run["results"][0]
+        note = run["invocations"][0]["toolExecutionNotifications"][0]
+        expected = "src/caf%C3%A9%20%2350%25.goose"
+        for item in (finding, note):
+            with self.subTest(message=item["message"]["text"]):
+                self.assertEqual(item["locations"][0]["physicalLocation"]["artifactLocation"]["uri"], expected)
+        self.assertIn(f"src/{name}", note["message"]["text"])
+
     def test_end_to_end_writes_valid_sarif_shape(self):
         out = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, out)
